@@ -1,0 +1,9 @@
+{% extends 'libApp/base.html' %}
+{% load static %}
+{% block content %}
+
+{% if role == 'user' %}
+  {% include 'libApp/userpage.html' %}
+
+{% endif %}
+{% endblock %}
