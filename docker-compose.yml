@@ -44,7 +44,7 @@ services:
             - 'MYSQL_ROOT_PASSWORD=secret'
             - 'MYSQL_ROOT_HOST=10.10.1.5'
         volumes:
-            - mysql-db:/var/lib/mysql
+            - ./mysql-db:/var/lib/mysql
 
     mongo_db:
         image: mongo
@@ -63,6 +63,7 @@ services:
         build: 
             context : ./data_storage_service
         command: python api.py
+        restart: always
         container_name: data_storage_api
         volumes:
             - ./data_storage_service:/api
@@ -105,5 +106,5 @@ networks:
             config:
                 - subnet: 10.10.1.0/24
 volumes:
-    mysql-db: ~
+    mysql-db: 
 

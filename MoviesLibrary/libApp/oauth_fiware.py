@@ -28,6 +28,8 @@ class OAuth2(object):
         self.token_url = self.idm_address + 'oauth2/token' # TOKEN URL
         self.signout_url = self.idm_address + 'auth/external_logout?_method=DELETE' 
 
+        self.wilma_url = 'http://10.10.1.3:1027/'
+
     def authorize_url(self, **kwargs):
         oauth_params = {'response_type': 'code','scope': 'token,permanent','state':'xyz', 'redirect_uri': self.redirect_uri, 'client_id': self.client_id}
         oauth_params.update(kwargs)
@@ -59,6 +61,19 @@ class OAuth2(object):
         uri = self.signout_url + '&client_id=' + self.client_id
         return uri
         
+    def get_movies_user(self,token):
+        headers = {
+            'X-Auth-Token' : token
+        }
+        uri = self.wilma_url + 'api/movies'
+        response = requests.get(uri, headers=headers)
+        # str_res = response.content.decode('utf-8')
+        # dict_res = json.loads(str_res)
+        return response.json() 
+
+
+
+
 """
 response from  /user?access_token=
 {

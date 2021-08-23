@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse,JsonResponse
-import json
+import json, datetime
 
 from .oauth_fiware import OAuth2 #external file
 auth_app = OAuth2()
@@ -34,6 +34,16 @@ def main(request):
         'uname' : uname,
         'role' : role,
     }
+    if not logged_in:
+        redirect('home')
+    else:
+        if role == 'user':
+            res = auth_app.get_movies_user(request.session.get('token', None))
+            movies = res
+            for movie in movies:
+                movie['start_date']=datetime.datetime.fromtimestamp(movie['start_date']['$date']/1000.0).strftime('%Y-%m-%d')
+            print(movies)
+            context['movies'] = res
     # print(logged_in)
     return render(request, 'libApp/main.html', context)
 
