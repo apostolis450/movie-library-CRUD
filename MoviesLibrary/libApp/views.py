@@ -40,9 +40,11 @@ def main(request):
         if role == 'user':
             res = auth_app.get_movies_user(request.session.get('token', None))
             movies = res
-            for movie in movies:
-                movie['start_date']=datetime.datetime.fromtimestamp(movie['start_date']['$date']/1000.0).strftime('%Y-%m-%d')
-            print(movies)
+            # -----------> converting unix time to readable date format
+            for i in range(len(movies)):
+                movies[i]['start_date'] = datetime.datetime.fromtimestamp(movies[i]['start_date']['$date']/1000.0).strftime('%Y-%m-%d')
+                movies[i]['end_date'] = datetime.datetime.fromtimestamp(movies[i]['end_date']['$date']/1000.0).strftime('%Y-%m-%d')
+            
             context['movies'] = res
     # print(logged_in)
     return render(request, 'libApp/main.html', context)

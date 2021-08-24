@@ -3,7 +3,7 @@ from flask_mongoengine import MongoEngine
 import datetime
 
 app = Flask(__name__)
-db_uri = 'mongodb://10.10.1.7:27017/Library'
+db_uri = 'mongodb://mongo_db:27017/Library'
 app.config['MONGODB_SETTINGS'] = {
     'db'   : 'Library',
     'host' : db_uri
@@ -13,34 +13,50 @@ db = MongoEngine(app)
 # db.init_app()
 
 # ---------------------- MODELS ---------------------------------
+class Cinema(db.Document):
+	name = db.StringField()
+	owner_id = db.StringField() # store ID from keyrock response
+	# movie_id = db.ReferenceField(Movies, required=True)
+
+	def to_json(self):
+		return {
+			"_id" : str(self.pk),
+			# "Movie" : self.movie_id.title,
+			"Owner_id" : self.owner_id,
+			"Cinema name"  : self.name
+		}
+
 class Movies(db.Document):
-	movie_id = db.SequenceField()
 	title = db.StringField()
 	cinema = db.StringField()
+	cinema_id = db.ReferenceField(Cinema, required=True)
 	category = db.StringField()
 	start_date = db.DateTimeField(default=datetime.datetime.utcnow().replace(microsecond=0), required=False)
 	end_date = db.DateTimeField(required=False)
 
 	def to_json(self):
 		return {
-			"movie_id"   : self.movie_id,
 			"title"      : self.title,
-			"cinema"     : self.cinema,
+			"cinema"     : self.cinema_id.title,
+			"cinema_id"     : self.cinema_id,
 			"start_date" : self.start_date,
 			"end_date"   : self.end_date
 		}
 
+
+
 class Favorites(db.Document):
-	fav_id = db.SequenceField()
-	movie_id = db.StringField()
-	user_id = db.StringField()
+	movie_id = db.ReferenceField(Movies, required=True)
+	user_id = db.StringField() # store ID from keyrock response
 
 	def to_json(self):
 		return {
-			"fav_id"   : self.movie_id,
-			"movie_id" : self.title,
-			"user_id"  : self.cinema
+			"_id" : str(self.pk),
+			"movie_title" : self.movie.title,
+			"user_id"  : self.user_id
 		}
+
+
 # ----------------------------------------------------------------
 
 # ---------------------- API ENDPOINTS ---------------------------
@@ -81,18 +97,42 @@ def api_movies():
 		movie.save()
 		return make_response("added", 201)
 
+@app.route('/api/favorites', methods=['GET', 'POST'])
+def api_favorites():
+	if request.method == 'GET':
+		favs = []
+		for fv in Favorites.objects:
+			favs.append(fv)
+		return make_response(jsonify(favs), 200)
+	elif request.method == 'POST':
+		content = request.json
+		"""
+		Find the movie from content data and add to user's favorites
+		"""
+		return make_response("added", 201)
+
+
 # ----------------------------------------------------------------
 @app.route('/api/db_init', methods=['POST'])
 def db_init():
+	Movies.drop_collection()
+	Favorites.drop_collection()
+	Cinema.drop_collection()
+
 	st = datetime.datetime.strptime("10-15-2021", "%m-%d-%Y")
 	ed = datetime.datetime.strptime("10-25-2021", "%m-%d-%Y")
-	movie1 = Movies(title="Movie 1",cinema="Odeon",category="action",start_date=st,end_date=ed)
-	movie1.save()
-	movie2 = Movies(title="Movie 2",cinema="Ster Cinema",category="drama",start_date=st,end_date=ed)
-	movie2.save()
-	movie3 = Movies(title="Movie 3",cinema="Odeon",category="comedy",start_date=st,end_date=ed)
-	movie3.save()
 
+	cinema1 = Cinema(name = "Odeon", owner_id= "37ff7ea9-e8c1-416b-82f1-5ce3c5e68ed5").save()
+
+	movie1 = Movies(title="Movie 1",cinema=cinema1.name,cinema_id=cinema1,category="action",start_date=st,end_date=ed)
+	movie1.save()
+	movie2 = Movies(title="Movie 2",cinema=cinema1.name,cinema_id=cinema1,category="drama",start_date=st,end_date=ed)
+	movie2.save()
+	movie3 = Movies(title="Movie 3",cinema=cinema1.name,cinema_id=cinema1,category="comedy",start_date=st,end_date=ed)
+	movie3.save()
+	
+	fav = Favorites(movie_id = movie3.title,user_id = "d23ec977-add4-456d-a367-adf77f2adaa3").save()
+	
 	return make_response("ok",201)
 
 

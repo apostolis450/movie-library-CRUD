@@ -61,6 +61,7 @@ class OAuth2(object):
         uri = self.signout_url + '&client_id=' + self.client_id
         return uri
         
+    # --------------> Calling api through pep proxy with token to get data from mongodb
     def get_movies_user(self,token):
         headers = {
             'X-Auth-Token' : token

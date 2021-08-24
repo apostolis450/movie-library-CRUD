@@ -23,3 +23,7 @@ body{
     height:max-content;
     margin-left: 50px; */
 }
+
+#movie-card {
+    margin-bottom: 20px;
+}
