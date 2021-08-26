@@ -72,6 +72,8 @@ services:
         networks:
             default:
                 ipv4_address: 10.10.1.2
+        environment: 
+            - PYTHONUNBUFFERED=1
     
     pep_proxy_wilma:
         image: fiware/pep-proxy

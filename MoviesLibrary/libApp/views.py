@@ -27,27 +27,55 @@ def main(request):
     logged_in = request.session.get('uid',False)
     uname = request.session.get('uname',None)
     role = request.session.get('role',None)
+    tk = request.session.get('token',None)
     context = {
         'logged_in' : logged_in,
         'auth_uri' : auth_uri,
         'signout_uri' : signout_uri,
         'uname' : uname,
         'role' : role,
+        'token' : tk,
     }
     if not logged_in:
         redirect('home')
     else:
         if role == 'user':
             res = auth_app.get_movies_user(request.session.get('token', None))
-            movies = res
-            # -----------> converting unix time to readable date format
-            for i in range(len(movies)):
-                movies[i]['start_date'] = datetime.datetime.fromtimestamp(movies[i]['start_date']['$date']/1000.0).strftime('%Y-%m-%d')
-                movies[i]['end_date'] = datetime.datetime.fromtimestamp(movies[i]['end_date']['$date']/1000.0).strftime('%Y-%m-%d')
-            
             context['movies'] = res
+        elif role == 'cinemaowner':
+            pass
+            
     # print(logged_in)
     return render(request, 'libApp/main.html', context)
+
+# redirect from main/button[favorites]
+def favorites(request):
+    logged_in = request.session.get('uid',False)
+    uname = request.session.get('uname',None)
+    role = request.session.get('role',None)
+    tk = request.session.get('token',None)
+    context = {
+        'logged_in' : logged_in,
+        'auth_uri' : auth_uri,
+        'signout_uri' : signout_uri,
+        'uname' : uname,
+        'role' : role,
+        'token' : tk,
+    }
+    if not logged_in:
+        redirect('home')
+    else:
+        if role == 'user':
+            res = auth_app.get_fav_movies_user(request.session.get('token', None))
+            context['movies'] = res
+            # print(res)
+        else:
+            pass
+    
+    return render(request, 'libApp/favorites.html', context)
+
+# def cinema(request):
+#      return render(request, 'libApp/cinema.html', context)
 
 
 #grab token after authorization and get user info from Keyrock

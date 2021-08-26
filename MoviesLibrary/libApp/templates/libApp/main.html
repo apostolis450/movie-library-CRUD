@@ -4,6 +4,7 @@
 
 {% if role == 'user' %}
   {% include 'libApp/userpage.html' %}
-
+{% elif role == 'cinemaowner' %}
+  {% include 'libApp/cinema.html' %}
 {% endif %}
 {% endblock %}
