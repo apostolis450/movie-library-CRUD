@@ -43,8 +43,10 @@ def main(request):
             res = auth_app.get_movies_user(request.session.get('token', None))
             context['movies'] = res
         elif role == 'cinemaowner':
-            pass
-            
+            print(logged_in)
+            res = auth_app.get_movies_owner(request.session.get('token', None))
+            context['movies'] = res
+            context['cinema_name'] = res[0]['cinema']
     # print(logged_in)
     return render(request, 'libApp/main.html', context)
 
@@ -74,8 +76,8 @@ def favorites(request):
     
     return render(request, 'libApp/favorites.html', context)
 
-# def cinema(request):
-#      return render(request, 'libApp/cinema.html', context)
+def manageMovies(request):
+     return render(request, 'libApp/cinema.html', context)
 
 
 #grab token after authorization and get user info from Keyrock

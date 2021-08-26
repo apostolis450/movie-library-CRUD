@@ -61,13 +61,15 @@ class Favorites(db.Document):
 # ----------------------------------------------------------------
 
 # ---------------------- API ENDPOINTS ---------------------------
-#get-update-delete a specific movie
+#get-update-delete a specific movie from CINEMAOWNER
 @app.route('/api/movies/<slug>', methods=['GET', 'PUT', 'DELETE',])
-def api_movie(slug):
+def api_cinemaowner(slug):
 	if request.method == 'GET':
-		movie_obj = Movies.objects(title = slug).first()
-		if movie_obj:
-			return make_response(jsonify(movie_obj.to_json()), 200)
+		cinema = Cinema.objects(owner_id = slug).first()
+		movies = []
+		for mv in Movies.objects(cinema_id = cinema.pk):
+			movies.append(mv.to_json())
+		return make_response(jsonify(movies), 200)
 	elif request.method == 'PUT':
 		content = request.json
 		movie_obj = Movies.objects(title = slug).first()

@@ -46,7 +46,7 @@
                 </li>
               {% elif role == 'cinemaowner' %}
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Manage movies</a>
+                    <a class="nav-link" href="{% url 'manage-movies' %}">Manage movies</a>
                 </li>
               {% else %}
                 <li class="nav-item active">

@@ -78,10 +78,15 @@ class OAuth2(object):
         }
         uri = self.wilma_url + 'api/favorites'
         response = requests.get(uri, headers=headers)
-        # str_res = response.content.decode('utf-8')
-        # dict_res = json.loads(str_res)
         return response.json() 
 
+    def get_movies_owner(self,token):
+        headers = {
+            'X-Auth-Token' : token
+        }
+        uri = self.wilma_url + 'api/movies'
+        response = requests.get(uri, headers=headers)
+        return response.json() 
 
 
 
