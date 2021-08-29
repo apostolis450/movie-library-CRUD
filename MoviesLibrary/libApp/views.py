@@ -43,7 +43,7 @@ def main(request):
             res = auth_app.get_movies_user(request.session.get('token', None))
             context['movies'] = res
         elif role == 'cinemaowner':
-            print(logged_in)
+            # request only owner's cinema movies
             res = auth_app.get_movies_owner(request.session.get('token', None))
             context['movies'] = res
             context['cinema_name'] = res[0]['cinema']
@@ -68,17 +68,27 @@ def favorites(request):
         redirect('home')
     else:
         if role == 'user':
-            res = auth_app.get_fav_movies_user(request.session.get('token', None))
-            context['movies'] = res
+            return render(request, 'libApp/favorites.html', context)        
+            # res = auth_app.get_fav_movies_user(request.session.get('token', None))
+            # context['movies'] = res
             # print(res)
         else:
-            pass
+            pass #Here I could redirect to a page saying 'unknown role!'
     
-    return render(request, 'libApp/favorites.html', context)
 
 def manageMovies(request):
-     return render(request, 'libApp/cinema.html', context)
+    """
+    New page, movies with an EDIT button
+    onClick,redirect tp app/manage-movies/<id> and show a form to make changes.
+    onSumbit -> update the movie using the API.
 
+    """
+    return render(request, 'libApp/cinema.html', context)
+
+def ajax_favorites(request):
+    if request.is_ajax():
+        res = auth_app.get_fav_movies_user(request.session.get('token', None))
+        return JsonResponse(json.dumps(res),safe=False)
 
 #grab token after authorization and get user info from Keyrock
 #store useful info as session variables

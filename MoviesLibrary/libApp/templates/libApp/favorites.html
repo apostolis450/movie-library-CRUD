@@ -6,7 +6,7 @@
 </div>
 <div class="container">
     <div class="row">
-      {% for mv in movies %}
+      <!-- {% for mv in movies %}
         <div class="col-3 col-md-4" id="movie-card">
           <div class="card {{mv.id}}">
             <img class="card-img-top" src="{% static 'images/placeholder.jpg' %}" alt="Card image cap">
@@ -22,12 +22,48 @@
         </div>
       {% empty %}
         <p>No movies...</p>
-      {% endfor %}
+      {% endfor %} -->
         
     </div>
   </div>
 
   <script type="text/javascript">
+    
+    $(document).ready(function(){
+      // console.log('this is run on page load');
+      // myFunction();
+      $.ajax({
+        type: "GET",
+        url: "/ajax/favorites",
+        dataType: "json",
+        data: {movies:'movies'},
+        success: function(data){
+          var row = $('div.row');
+          if(JSON.parse(data).length == 0){
+             row.append('<p class="text-center h2">You have no favorite movies..</p>')
+          }
+          $.each(JSON.parse(data), function(i,mv){
+            // console.log(mv)
+            var html = `<div class="col-3 col-md-4" id="movie-card">\n\t<div class="card `+mv.id+`">
+              \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
+              \n<div class="card-body">
+              \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+mv.title+`</h5>
+              \n<p class="card-text"><strong>Cinema:</strong>`+mv.cinema+`</p>
+              \n<p class="card-text"><strong>Category:</strong>`+mv.category+`</p>
+              \n<p class="card-text"><small class="text-muted">Starts at: <b>`+mv.start_date+`+</b></small></p>
+              \n<p class="card-text"><small class="text-muted">Ends at: <b>`+mv.end_date+`</b></small></p>
+              \n<input class="btn btn-danger" data-movieid = `+ mv.id +` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
+              \n</div>\n</div>\n</div>
+              `
+              row.append(html)
+          })
+         },
+        error: function(response,e){
+          console.log(e)
+         }
+       });
+    });
+    
     function ajax($this) {
         var tk = "{{token}}";
         var mvid = $this.data('movieid');
@@ -44,17 +80,50 @@
                       uid : uid
                      },
                     success: function(response) {
-                        // $("div.card").remove(".".concat(mvid));
+                        $("div.card").remove(".".concat(mvid));
+                        $("div.row").empty();
                         setTimeout(function(){// wait for 5 secs(2)
-                            location.reload(); // then reload the page.(3)
-                        }, 200); 
+                          reload(); // then reload the page.(3)
+                        }, 200);
                     },
                     error: function(rs, e) {
-                        console.log(".".concat(mvid))
+                        // console.log(".".concat(mvid))
                         alert(rs.responseText);
                     }
                   }); 
-            }
-    
+    }
+
+    function reload(){
+      $.ajax({
+         type: "GET",
+         url: "/ajax/favorites",
+         dataType: "json",
+         data: {movies:'movies'},
+         success: function(data){
+           if(data == ''){
+             console.log('emptyyyyyyyyyyyyyyyyyy')
+           }
+           var row = $('div.row');
+           $.each(JSON.parse(data), function(i,mv){
+             // console.log(mv)
+             var html = `<div class="col-3 col-md-4" id="movie-card">\n\t<div class="card `+mv.id+`">
+               \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
+               \n<div class="card-body">
+               \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+mv.title+`</h5>
+               \n<p class="card-text"><strong>Cinema:</strong>`+mv.cinema+`</p>
+               \n<p class="card-text"><strong>Category:</strong>`+mv.category+`</p>
+               \n<p class="card-text"><small class="text-muted">Starts at: <b>`+mv.start_date+`+</b></small></p>
+               \n<p class="card-text"><small class="text-muted">Ends at: <b>`+mv.end_date+`</b></small></p>
+               \n<input class="btn btn-danger" data-movieid = `+mv.id+` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
+               \n</div>\n</div>\n</div>
+               `
+               row.append(html)
+           })
+          },
+         error: function(response,e){
+           console.log(e)
+          }
+      });
+    }
       </script>
 {% endblock %}

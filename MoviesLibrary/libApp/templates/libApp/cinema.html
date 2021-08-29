@@ -1,6 +1,6 @@
 {% load static %}
 <div class="bg-secondary w-75" style="margin: 0 auto;margin-bottom: 20px; border-radius: 20px;">
-    <p class="text-center text-white h3">Movies playing at {{ cinema_name}} cinema!</p>
+    <p class="text-center text-white h3">Movies playing in <strong>{{ cinema_name}}</strong> cinema!</p>
 </div>
 <div class="container">
     <div class="row">
@@ -10,7 +10,7 @@
           <div class="card" >
             <img class="card-img-top" src="{% static 'images/placeholder.jpg' %}" alt="Card image cap">
             <div class="card-body">
-              <h5 class="card-title bg-light" style="text-align: center;font-size:35px">{{ mv.title }}</h5>
+              <h5 class="card-title bg-light" style="text-align: center;font-size:35px;border-radius: 20px;">{{ mv.title }}</h5>
               <p class="card-text"><strong>Cinema:</strong> {{ mv.cinema }}</p>
               <p class="card-text"><strong>Category:</strong> {{ mv.category }}</p>
               <p class="card-text"><small class="text-muted">Starts at: <b>{{ mv.start_date }}</b></small></p>
