@@ -80,14 +80,22 @@ class OAuth2(object):
         response = requests.get(uri, headers=headers)
         return response.json() 
 
-    def get_movies_owner(self,token):
+    def get_movies_owner(self,token,uid):
         headers = {
             'X-Auth-Token' : token
         }
-        uri = self.wilma_url + 'api/movies'
+        uri = self.wilma_url + 'api/movies/owner/' + uid
         response = requests.get(uri, headers=headers)
         return response.json() 
-
+    
+    def get_movie_owner_edit(self,token,mvid):
+        headers = {
+            'X-Auth-Token' : token
+        }
+        uri = self.wilma_url + 'api/movie-owner/' + mvid
+        response = requests.get(uri, headers=headers)
+        return response.json() 
+    
 
 
 """

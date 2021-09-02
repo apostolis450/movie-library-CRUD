@@ -61,11 +61,11 @@ class Favorites(db.Document):
 # ----------------------------------------------------------------
 
 # ---------------------- API ENDPOINTS ---------------------------
-#get-update-delete a specific movie from CINEMAOWNER
-@app.route('/api/movies/<slug>', methods=['GET', 'PUT', 'DELETE',])
+#get-update-delete a specific movie for CINEMAOWNER
+@app.route('/api/movies/owner/<slug>', methods=['GET', 'PUT', 'DELETE',])
 def api_cinemaowner(slug):
 	if request.method == 'GET':
-		cinema = Cinema.objects(owner_id = slug).first()
+		cinema = Cinema.objects(owner_id = str(slug)).first()
 		movies = []
 		for mv in Movies.objects(cinema_id = cinema.pk):
 			movies.append(mv.to_json())
@@ -80,7 +80,14 @@ def api_cinemaowner(slug):
 		movie_obj.delete()
 		return make_response("deleted!", 204)
 
-# /api/movies/search/<slug> for use with search and __contains  <-----------
+# TODO: /api/movies/search/<slug> for use with search and __contains  <-----------
+
+@app.route('/api/movie-owner/<mvid>', methods=['GET', 'POST'])
+def edit_movie(mvid):
+	if request.method == 'GET':
+		movie = Movies.objects(pk = mvid).first()
+		return make_response(movie.to_json(), 200)
+
 
 #get all movies / Post new movie
 @app.route('/api/movies', methods=['GET', 'POST'])
@@ -144,13 +151,16 @@ def db_init():
 	ed = datetime.datetime.strptime("10-25-2021", "%m-%d-%Y")
 
 	cinema1 = Cinema(name = "Odeon", owner_id= "37ff7ea9-e8c1-416b-82f1-5ce3c5e68ed5").save()
+	
 
-	movie1 = Movies(title="The Suicide Squad",cinema=cinema1.name,cinema_id=cinema1,category="action",start_date=st,end_date=ed)
+	movie1 = Movies(title="The Suicide Squad",cinema=cinema1.name,cinema_id=cinema1,category="Action",start_date=st,end_date=ed)
 	movie1.save()
-	movie2 = Movies(title="Joker",cinema=cinema1.name,cinema_id=cinema1,category="drama",start_date=st,end_date=ed)
+	movie2 = Movies(title="Joker",cinema=cinema1.name,cinema_id=cinema1,category="Drama",start_date=st,end_date=ed)
 	movie2.save()
-	movie3 = Movies(title="Tenet",cinema=cinema1.name,cinema_id=cinema1,category="comedy",start_date=st,end_date=ed)
+	movie3 = Movies(title="Tenet",cinema=cinema1.name,cinema_id=cinema1,category="Comedy",start_date=st,end_date=ed)
 	movie3.save()
+	movie4 = Movies(title="The Big Short",cinema=cinema1.name,cinema_id=cinema1,category="Drama",start_date=st,end_date=ed)
+	movie4.save()
 	
 	fav = Favorites(movie_id = movie3,user_id = "37ff7ea9-e8c1-416b-82f1-5ce3c5e68ed5").save()
 	fav.delete()

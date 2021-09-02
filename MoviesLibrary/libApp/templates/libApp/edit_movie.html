@@ -1,0 +1,101 @@
+{% extends 'libApp/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row" style="margin-top: 50px;">
+        <div class="col-auto mr-auto col-4" id="movie-card">
+        </div>
+        <div class="col-auto col-4" style="background-color: rgb(197, 197, 225); padding: 20px; border: 1px solid;">
+            <form>
+                <div class="form-group">
+                  <label for="movie-title">Title</label>
+                  <input type="text" class="form-control" id="movie-title" placeholder="Enter title">
+                </div>
+                <div class="form-group">
+                    <label for="movie-category">Select Category</label>
+                    <!-- <input type="range" class="form-control" id="movie-category" placeholder="Enter title"> -->
+                    <br>
+                    <select id="categories" name="categories">
+                        <option value="">Adventure</option>
+                        <option value="">Action</option>
+                        <option value="">Comedy</option>
+                        <option value="">Crime</option>
+                        <option value="">Drama</option>
+                        <option value="">Horror</option>
+                        <option value="">Romance</option>
+                        <option value="">Thriller</option>
+                      </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="movie-sdate">Starting date</label>
+                    <input type="date" class="form-control" id="movie-sdate">
+                  </div>
+                <div class="form-group">
+                  <label for="movie-edate">Ending date</label>
+                  <input type="date" class="form-control" id="movie-edate">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    
+    $(document).ready(function(){
+      $.ajax({
+        type: "GET",
+        url: "/ajax/manage-movie/".concat("{{url_id}}"),
+        dataType: "json",
+        data: {},
+        success: function(data){
+          var card = $('#movie-card');
+          var html = `<div class="card `+data.id+`">
+              \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
+              \n<div class="card-body">
+              \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+data.title+`</h5>
+              \n<p class="card-text"><strong>Cinema:</strong>`+data.cinema+`</p>
+              \n<p class="card-text"><strong>Category:</strong>`+data.category+`</p>
+              \n<p class="card-text"><small class="text-muted">Starts at: <b>`+data.start_date+`+</b></small></p>
+              \n<p class="card-text"><small class="text-muted">Ends at: <b>`+data.end_date+`</b></small></p>
+              \n<input class="btn btn-danger" data-movieid = `+ data.id +` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
+              \n</div>\n</div>
+          `
+          card.append(html)
+          }
+        });
+      });
+    
+      function ajax($this) {
+          $.ajax({
+                type: "DELETE",
+                url: "ajax/manage-movie/".concat("{{url_id}}"),
+                dataType: "json",
+                data: {},
+                success: function(response) {
+                    $("div.card").remove(".".concat(mvid));
+                    $("div.row").empty();
+                    setTimeout(function(){// wait for 5 secs(2)
+                      location.href = "/app"; // then reload the page.(3)
+                    }, 200);
+                },
+                error: function(rs, e) {
+                    // console.log(".".concat(mvid))
+                    alert(rs.responseText);
+                }
+            }); 
+          }
+</script>
+
+{% endblock %}
+<div class="card `+mv.id+`">
+  \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
+  \n<div class="card-body">
+  \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+mv.title+`</h5>
+  \n<p class="card-text"><strong>Cinema:</strong>`+mv.cinema+`</p>
+  \n<p class="card-text"><strong>Category:</strong>`+mv.category+`</p>
+  \n<p class="card-text"><small class="text-muted">Starts at: <b>`+mv.start_date+`+</b></small></p>
+  \n<p class="card-text"><small class="text-muted">Ends at: <b>`+mv.end_date+`</b></small></p>
+  \n<input class="btn btn-danger" data-movieid = `+mv.id+` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
+  \n</div>\n</div>

@@ -17,12 +17,7 @@ body{
 .card-colums{
     height: min-content;
 }
-.main-container {
-    /* background-color:blue; 
-    width: 90%;
-    height:max-content;
-    margin-left: 50px; */
-}
+
 
 #movie-card {
     margin-bottom: 20px;

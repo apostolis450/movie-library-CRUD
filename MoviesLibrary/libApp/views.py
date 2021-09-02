@@ -24,7 +24,7 @@ def home(request):
 
 # after USER login -> localhost:8000/app
 def main(request):
-    logged_in = request.session.get('uid',False)
+    logged_in = request.session.get('uid',False) #USER KEYROCK ID
     uname = request.session.get('uname',None)
     role = request.session.get('role',None)
     tk = request.session.get('token',None)
@@ -44,7 +44,7 @@ def main(request):
             context['movies'] = res
         elif role == 'cinemaowner':
             # request only owner's cinema movies
-            res = auth_app.get_movies_owner(request.session.get('token', None))
+            res = auth_app.get_movies_owner(request.session.get('token', None),logged_in)
             context['movies'] = res
             context['cinema_name'] = res[0]['cinema']
     # print(logged_in)
@@ -73,17 +73,44 @@ def favorites(request):
             # context['movies'] = res
             # print(res)
         else:
-            pass #Here I could redirect to a page saying 'unknown role!'
+            pass #Here I could redirect to a page saying 'unknown role!' or not authorized to access this page
     
 
-def manageMovies(request):
+def add_movie(request):
     """
     New page, movies with an EDIT button
     onClick,redirect tp app/manage-movies/<id> and show a form to make changes.
     onSumbit -> update the movie using the API.
-
     """
+
     return render(request, 'libApp/cinema.html', context)
+
+def manage_movie(request,id):
+    logged_in = request.session.get('uid',False)
+    uname = request.session.get('uname',None)
+    role = request.session.get('role',None)
+    tk = request.session.get('token',None)
+    context = {
+        'logged_in' : logged_in,
+        'auth_uri' : auth_uri,
+        'signout_uri' : signout_uri,
+        'uname' : uname,
+        'role' : role,
+        'token' : tk,
+        'url_id': id,
+    }
+    if not logged_in:
+        redirect('home')
+    else:
+        if role == 'cinemaowner':
+            return render(request, 'libApp/edit_movie.html',context)
+
+# get chosen movie only for edit 
+def ajax_manage_movie(request,id):
+    if request.is_ajax():
+        res = auth_app.get_movie_owner_edit(request.session.get('token', None),id)
+        return JsonResponse(res,safe=False)
+        
 
 def ajax_favorites(request):
     if request.is_ajax():

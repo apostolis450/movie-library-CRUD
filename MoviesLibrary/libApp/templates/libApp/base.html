@@ -33,20 +33,20 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <!-- main selections from navbar -->
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+            <li class="nav-item active" style="border-right: 1px solid; margin-right: 10px;">
             {% if logged_in %}
-                  <a class="nav-link" href="{% url 'main' %}">Home <span class="sr-only">(current)</span></a>
+                  <a class="nav-link" href="{% url 'main' %}"><b>Home</b> <span class="sr-only">(current)</span></a>
               </li>
               {% if role == 'user' %}
                 <!-- <li class="nav-item active">
                     <a class="nav-link" href="#">Movies</a>
                 </li> -->
                 <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'favorites' %}">Favorites</a>
+                    <a class="nav-link" href="{% url 'favorites' %}"><b>Favorites</b> </a>
                 </li>
               {% elif role == 'cinemaowner' %}
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'manage-movies' %}">Manage movies</a>
+                <li class="nav-item active" >
+                    <a class="nav-link" href="{% url 'add-movies' %}"><b>Register a new movie</b> </a>
                 </li>
               {% else %}
                 <li class="nav-item active">
@@ -74,13 +74,13 @@
     <hr>
     {% if not logged_in %}
       <h2 style="text-align : center;margin-top: 100px;"><strong>Please Log in to use the App</strong></h2>
+    {% else %}
+      <div class="main-container">
+          {% block content %}
+
+          {% endblock content %}
+      </div>
     {% endif %}
-    <div class="main-container">
-        {% block content %}
-
-        {% endblock content %}
-    </div>
-
 
     <!-- Bootstrap Js and JQuery -->
     
