@@ -2,11 +2,12 @@
 {% load static %}
 {% block content %}
 <div class="container">
-    <div class="row" style="margin-top: 50px;">
-        <div class="col-auto mr-auto col-4" id="movie-card">
-        </div>
+    <div class="row justify-content-center" style="margin-top: 50px;">
         <!-- edit form -->
-        <div class="col-auto col-4" style="background-color: rgb(197, 197, 225); padding: 20px; border: 1px solid;">
+        <div class="col-4 col-lg-4 "  style="background-color: rgb(197, 197, 225); padding: 20px; border: 1px solid;">
+            <p style="font-family: 'Times New Roman', Times, serif; text-align:center; font-size:larger"><b>Register a new movie</b></p>
+            <hr>
+            <br>
             <form method="post">
                 <div class="form-group">
                   <label for="movie-title">Title</label>
@@ -44,56 +45,8 @@
 
 
 <script type="text/javascript">
-    
-    $(document).ready(function(){
-      $.ajax({
-        type: "GET",
-        url: "/ajax/manage-movie/".concat("{{url_id}}"),
-        dataType: "json",
-        data: {},
-        success: function(data){
-          var card = $('#movie-card');
-          var html = `<div class="card `+data.id+`">
-              \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
-              \n<div class="card-body">
-              \n\t<h5 class="card-title bg-light" id="title" style="text-align: center;font-size:35px">`+data.title+`</h5>
-              \n<strong style="float:left;">Cinema:</strong>
-              \n<p class="card-text" id="cinema">`+data.cinema+`</p>
-              \n<p class="card-text"><strong>Category:</strong><span id="category">`+data.category+`</span></p>
-              \n<p class="card-text"><small class="text-muted">Starts at: <b id="sdate">`+data.start_date+`</b></small></p>
-              \n<p class="card-text"><small class="text-muted">Ends at: <b id="edate">`+data.end_date+`</b></small></p>
-              \n</div>\n</div>
-           `
-          card.append(html)
-          }
-        });
-      });
-    
-      function loadCard(){
-        
-      }
 
-      function ajax($this) {
-          $.ajax({
-                type: "DELETE",
-                url: "ajax/manage-movie/".concat("{{url_id}}"),
-                dataType: "json",
-                data: {},
-                success: function(response) {
-                    // $("div.card").remove(".".concat(mvid));
-                    // $("div.row").empty();
-                    setTimeout(function(){
-                      location.href = "/app";
-                    }, 200);
-                },
-                error: function(rs, e) {
-                    alert(rs.responseText);
-                }
-            }); 
-          }
-
-
-      $("button").on("click", function(e){
+    $("button").on("click", function(e){
         e.preventDefault();
         var mvdata = {
           title : $('#movie-title').val(),
@@ -137,7 +90,7 @@
         else{
           return false;
         }
-      })
+    })
 
 </script>
 

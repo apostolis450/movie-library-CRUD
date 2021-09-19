@@ -98,26 +98,3 @@ class OAuth2(object):
     
 
 
-"""
-response from  /user?access_token=
-{
-    "organizations":[],"displayName":"",
-    "roles":[{"id":"e088940d-463e-48ab-9215-e597990ec5f6","name":"test"}],
-    "app_id":"9f45b53d-f67e-4733-87bc-85810b160637",
-    "trusted_apps":[],
-    "isGravatarEnabled":false,
-    "id":"d23ec977-add4-456d-a367-adf77f2adaa3",
-    "authorization_decision":"",
-    "app_azf_domain":"",
-    "eidas_profile":{},
-    "attributes":{},
-    "shared_attributes":"",
-    "username":"nikolakis",
-    "email":"nikolakis@mpampinos.com",
-    "given_name":"nikolakis",
-    "family_name":"nikolakis",
-    "image":"","gravatar":"",
-    "extra":"",
-    "sub":"d23ec977-add4-456d-a367-adf77f2adaa3"
-    }
-"""

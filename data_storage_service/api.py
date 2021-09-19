@@ -82,11 +82,23 @@ def api_cinemaowner(slug):
 
 # TODO: /api/movies/search/<slug> for use with search and __contains  <-----------
 
-@app.route('/api/movie-owner/<mvid>', methods=['GET', 'POST'])
+@app.route('/api/movie-owner/<mvid>', methods=['GET', 'POST','PUT'])
 def edit_movie(mvid):
 	if request.method == 'GET':
 		movie = Movies.objects(pk = mvid).first()
 		return make_response(movie.to_json(), 200)
+	elif request.method == 'PUT':
+		content=request.json
+		movie_obj=Movies.objects(pk = content['mv_id'])
+		print("-----------------------------------------\nAPOTTELESMATA\n---------------------------------")
+		# print(datetime.datetime.strptime(content['start_date'], "%Y-%m-%d"))
+		# print(content)
+		# print(movie_obj.to_json())
+		# movie = Movies.objects(pk = mvid).first()
+		st = datetime.datetime.strptime(content['start_date'], "%Y-%m-%d")
+		ed = datetime.datetime.strptime(content['end_date'], "%Y-%m-%d")
+		movie_obj.update(title = content['title'], category = content['category'],start_date=st,end_date=ed)
+		return make_response(movie_obj.to_json(), 201)
 
 
 #get all movies / Post new movie

@@ -77,19 +77,11 @@ def favorites(request):
     
 
 def add_movie(request):
-    """
-    New page, movies with an EDIT button
-    onClick,redirect tp app/manage-movies/<id> and show a form to make changes.
-    onSumbit -> update the movie using the API.
-    """
-
-    return render(request, 'libApp/cinema.html', context)
-
-def manage_movie(request,id):
     logged_in = request.session.get('uid',False)
     uname = request.session.get('uname',None)
     role = request.session.get('role',None)
     tk = request.session.get('token',None)
+    wilma_url = auth_app.wilma_url
     context = {
         'logged_in' : logged_in,
         'auth_uri' : auth_uri,
@@ -98,6 +90,29 @@ def manage_movie(request,id):
         'role' : role,
         'token' : tk,
         'url_id': id,
+        'wilma_url': wilma_url,
+    }
+    if not logged_in:
+        redirect('home')
+    else:
+        if role == 'cinemaowner':
+            return render(request, 'libApp/add_movie.html',context)
+
+def manage_movie(request,id):
+    logged_in = request.session.get('uid',False)
+    uname = request.session.get('uname',None)
+    role = request.session.get('role',None)
+    tk = request.session.get('token',None)
+    wilma_url = auth_app.wilma_url
+    context = {
+        'logged_in' : logged_in,
+        'auth_uri' : auth_uri,
+        'signout_uri' : signout_uri,
+        'uname' : uname,
+        'role' : role,
+        'token' : tk,
+        'url_id': id,
+        'wilma_url': wilma_url,
     }
     if not logged_in:
         redirect('home')
@@ -107,10 +122,10 @@ def manage_movie(request,id):
 
 # get chosen movie only for edit 
 def ajax_manage_movie(request,id):
-    if request.is_ajax():
+    if request.method == 'GET':
         res = auth_app.get_movie_owner_edit(request.session.get('token', None),id)
         return JsonResponse(res,safe=False)
-        
+    
 
 def ajax_favorites(request):
     if request.is_ajax():
@@ -142,7 +157,7 @@ def auth(request):
     return redirect('main')
 
 #idm logout is done by DELETE /auth/external_logout..
-#and finaly here session is deleted
+#and session variables get deleted
 def logout(request):
     request.session.flush()
     return redirect('home')
