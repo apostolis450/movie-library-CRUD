@@ -12,7 +12,10 @@ notes.txt
 
 mongo_db/*
 
-MoviesLibrary/libApp/__pycache__/*
-MoviesLibrary/MoviesLibrary/__pycache__/*
-MoviesLibrary/libApp/migrations/*
+web/MoviesLibrary/libApp/__pycache__/*
+web/MoviesLibrary/MoviesLibrary/__pycache__/*
+web/MoviesLibrary/libApp/migrations/*
 
+
+
+dump/
