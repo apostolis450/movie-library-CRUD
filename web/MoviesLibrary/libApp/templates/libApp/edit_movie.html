@@ -1,0 +1,145 @@
+{% extends 'libApp/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row" style="margin-top: 50px;">
+        <div class="col-auto mr-auto col-4" id="movie-card">
+        </div>
+        <!-- edit form -->
+        <div class="col-auto col-4" style="background-color: rgb(197, 197, 225); padding: 20px; border: 1px solid;">
+            <form method="POST">
+                <div class="form-group">
+                  <label for="movie-title">Title</label>
+                  <input type="text" class="form-control" id="movie-title" placeholder="Enter title" required="required" >
+                </div>
+                <div class="form-group">
+                    <label for="movie-category">Select Category</label>
+                    <!-- <input type="range" class="form-control" id="movie-category" placeholder="Enter title"> -->
+                    <br>
+                    <select id="categories" name="categories">
+                        <option disabled selected> -- select an option -- </option>
+                        <option value="">Adventure</option>
+                        <option value="">Action</option>
+                        <option value="">Comedy</option>
+                        <option value="">Crime</option>
+                        <option value="">Drama</option>
+                        <option value="">Horror</option>
+                        <option value="">Romance</option>
+                        <option value="">Thriller</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="movie-sdate">Starting date</label>
+                    <input type="date" class="form-control" id="movie-sdate" placeholder="dd-mm-yyyy" value="" min="2021-01-01" max="2030-12-31" required="required">
+                  </div>
+                <div class="form-group">
+                  <label for="movie-edate">Ending date</label>
+                  <input type="date" class="form-control" id="movie-edate" placeholder="dd-mm-yyyy" value="" min="2021-01-01" max="2030-12-31" required="required">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    
+    $(document).ready(function(){
+      $.ajax({
+        type: "GET",
+        url: "/ajax/manage-movie/".concat("{{url_id}}"),
+        dataType: "json",
+        data: {},
+        success: function(data){
+          var card = $('#movie-card');
+          var html = `<div class="card `+data.id+`">
+              \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
+              \n<div class="card-body">
+              \n\t<h5 class="card-title bg-light" id="title" style="text-align: center;font-size:35px">`+data.title+`</h5>
+              \n<strong style="float:left;">Cinema:</strong>
+              \n<p class="card-text" id="cinema">`+data.cinema+`</p>
+              \n<p class="card-text"><strong>Category:</strong><span id="category">`+data.category+`</span></p>
+              \n<p class="card-text"><small class="text-muted">Starts at: <b id="sdate">`+data.start_date+`</b></small></p>
+              \n<p class="card-text"><small class="text-muted">Ends at: <b id="edate">`+data.end_date+`</b></small></p>
+              \n</div>\n</div>
+           `
+          card.append(html)
+          }
+        });
+      });
+    
+      function loadCard(){
+        
+      }
+
+      function ajax($this) {
+          $.ajax({
+                type: "DELETE",
+                url: "ajax/manage-movie/".concat("{{url_id}}"),
+                dataType: "json",
+                data: {},
+                success: function(response) {
+                    // $("div.card").remove(".".concat(mvid));
+                    // $("div.row").empty();
+                    setTimeout(function(){
+                      location.href = "/app";
+                    }, 200);
+                },
+                error: function(rs, e) {
+                    alert(rs.responseText);
+                }
+            }); 
+          }
+
+
+      $("button").on("click", function(e){
+        e.preventDefault();
+        var mvdata = {
+          title : $('#movie-title').val(),
+          category : $('#categories option:selected').text(),
+          start_date : $('#movie-sdate').val(),
+          end_date : $('#movie-edate').val(),
+          mv_id : "{{url_id}}"
+        }
+        var tk = "{{token}}";
+        
+        // check if fields are non empty before sending the ajax request
+        if(mvdata.title && mvdata.category && mvdata.start_date && mvdata.end_date && mvdata.mv_id){
+          $("button").text("Updating..");
+          $.ajax({
+            url: "{{wilma_url}}".concat("api/movie-owner/{{url_id}}"),
+            headers: {
+              "X-Auth-Token": tk
+            },
+            type: "PUT",
+            dataType: "json",
+            contentType: "application/json",
+            data : JSON.stringify(mvdata),
+            success: function(data) {
+              // loadCard();
+              var info = data[0];
+              var sdate = new Date(info.start_date['$date']).toUTCString();
+              var edate = new Date(info.end_date['$date']).toUTCString();
+              // console.log(new Date(info.start_date['$date']).toUTCString());
+              console.log(info);
+              setTimeout(function (){
+                $("#title").text(info.title);
+                $("#category").text(info.category);
+                $("#sdate").text(sdate);
+                $("#edate").text(edate);
+                $("button").text("Submit");
+              },500)
+
+            }
+          })
+        }
+        else{
+          return false;
+        }
+      })
+
+</script>
+
+{% endblock %}

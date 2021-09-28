@@ -1,0 +1,112 @@
+{% extends 'libApp/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center" style="margin-top: 50px;">
+        <!-- edit form -->
+        <div class="col-4 col-lg-4 "  style="background-color: rgb(197, 197, 225); padding: 20px; border: 1px solid;">
+            <p style="font-family: 'Times New Roman', Times, serif; text-align:center; font-size:larger"><b>Register a new movie</b></p>
+            <hr>
+            <br>
+            {% if messages %}
+            <div id="message">
+              {% for msg in messages %}
+                <p style="text-align:center">{{msg}}</p>
+              {% endfor %}
+              <br>
+            </div>
+            {% endif %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="movie-title">Title</label>
+                  <input type="text" name="movie-title" class="form-control" id="movie-title" placeholder="Enter title" required="required" >
+                </div>
+                <div class="form-group">
+                    <label for="movie-category">Select Category</label>
+                    <!-- <input type="range" class="form-control" id="movie-category" placeholder="Enter title"> -->
+                    <br>
+                    <select id="categories" name="category">
+                        <option disabled selected> -- select an option -- </option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Action">Action</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Crime">Crime</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Thriller">Thriller</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="movie-sdate">Starting date</label>
+                    <input type="date" name="sdate" class="form-control" id="movie-sdate" placeholder="dd-mm-yyyy" value="" min="2021-01-01" max="2030-12-31" required="required">
+                  </div>
+                <div class="form-group">
+                  <label for="movie-edate">Ending date</label>
+                  <input type="date" name="edate" class="form-control" id="movie-edate" placeholder="dd-mm-yyyy" value="" min="2021-01-01" max="2030-12-31" required="required">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  setTimeout(function(){
+        if ($('#message').length > 0) {
+            $('#message').remove();
+        }
+    }, 2000) 
+        
+
+    
+    // $("button").on("click", function(e){
+    //     e.preventDefault();
+    //     var mvdata = {
+    //       title : $('#movie-title').val(),
+    //       category : $('#categories option:selected').text(),
+    //       start_date : $('#movie-sdate').val(),
+    //       end_date : $('#movie-edate').val(),
+    //       mv_id : "{{url_id}}"
+    //     }
+    //     var tk = "{{token}}";
+        
+    //     // check if fields are non empty before sending the ajax request
+    //     if(mvdata.title && mvdata.category && mvdata.start_date && mvdata.end_date && mvdata.mv_id){
+    //       $("button").text("Updating..");
+    //       $.ajax({
+    //         url: "{{wilma_url}}".concat("api/movie-owner/{{url_id}}"),
+    //         headers: {
+    //           "X-Auth-Token": tk
+    //         },
+    //         type: "POST",
+    //         dataType: "json",
+    //         contentType: "application/json",
+    //         data : JSON.stringify(mvdata),
+    //         success: function(data) {
+    //           // loadCard();
+    //           var info = data[0];
+    //           var sdate = new Date(info.start_date['$date']).toUTCString();
+    //           var edate = new Date(info.end_date['$date']).toUTCString();
+    //           // console.log(new Date(info.start_date['$date']).toUTCString());
+    //           console.log(info);
+    //           setTimeout(function (){
+    //             $("#title").text(info.title);
+    //             $("#category").text(info.category);
+    //             $("#sdate").text(sdate);
+    //             $("#edate").text(edate);
+    //             $("button").text("Submit");
+    //           },500)
+
+    //         }
+    //       })
+    //     }
+    //     else{
+    //       return false;
+    //     }
+    // })
+
+</script>
+
+{% endblock %}

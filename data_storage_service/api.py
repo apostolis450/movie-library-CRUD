@@ -90,15 +90,27 @@ def edit_movie(mvid):
 	elif request.method == 'PUT':
 		content=request.json
 		movie_obj=Movies.objects(pk = content['mv_id'])
-		print("-----------------------------------------\nAPOTTELESMATA\n---------------------------------")
-		# print(datetime.datetime.strptime(content['start_date'], "%Y-%m-%d"))
-		# print(content)
-		# print(movie_obj.to_json())
-		# movie = Movies.objects(pk = mvid).first()
 		st = datetime.datetime.strptime(content['start_date'], "%Y-%m-%d")
 		ed = datetime.datetime.strptime(content['end_date'], "%Y-%m-%d")
 		movie_obj.update(title = content['title'], category = content['category'],start_date=st,end_date=ed)
 		return make_response(movie_obj.to_json(), 201)
+	elif request.method == 'POST':
+		content=json.loads(request.data.decode('UTF-8'))
+		# Sample of incoming data format ->
+		# {"movie-title": "asdasdasd", "category": "Action", "sdate": "2021-09-10", "edate": "2021-09-29"}
+		title = content['movie-title']
+		category = content['category']
+		st = datetime.datetime.strptime(content['sdate'], "%Y-%m-%d")
+		ed = datetime.datetime.strptime(content['edate'], "%Y-%m-%d")
+		# I need cinema name and cinema's ID
+		cinema = Cinema.objects(owner_id=content['uid']).first()
+		movie = Movies(title=title,cinema=cinema.name,cinema_id=cinema.pk,category=category,start_date=st,end_date=ed)
+		movie.save()
+		return make_response("Successful registration!", 201)
+	elif request.method == 'DELETE':
+		movie_obj = Movies.objects(pk = mvid).first()
+		movie_obj.delete()
+		return make_response("deleted!", 204)
 
 
 #get all movies / Post new movie
@@ -163,7 +175,6 @@ def db_init():
 	ed = datetime.datetime.strptime("10-25-2021", "%m-%d-%Y")
 
 	cinema1 = Cinema(name = "Odeon", owner_id= "37ff7ea9-e8c1-416b-82f1-5ce3c5e68ed5").save()
-	
 
 	movie1 = Movies(title="The Suicide Squad",cinema=cinema1.name,cinema_id=cinema1,category="Action",start_date=st,end_date=ed)
 	movie1.save()
