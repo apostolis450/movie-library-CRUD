@@ -68,42 +68,54 @@
     //       category : $('#categories option:selected').text(),
     //       start_date : $('#movie-sdate').val(),
     //       end_date : $('#movie-edate').val(),
-    //       mv_id : "{{url_id}}"
+    //       // mv_id : "{{url_id}}"
     //     }
     //     var tk = "{{token}}";
         
     //     // check if fields are non empty before sending the ajax request
-    //     if(mvdata.title && mvdata.category && mvdata.start_date && mvdata.end_date && mvdata.mv_id){
-    //       $("button").text("Updating..");
+    //     if(mvdata.title && mvdata.category && mvdata.start_date && mvdata.end_date){
     //       $.ajax({
-    //         url: "{{wilma_url}}".concat("api/movie-owner/{{url_id}}"),
+    //         url: "/ajax/create-entity",
     //         headers: {
-    //           "X-Auth-Token": tk
+    //           "X-Auth-Token": tk,
+    //           "Content-Type": "application/json",
     //         },
     //         type: "POST",
-    //         dataType: "json",
-    //         contentType: "application/json",
-    //         data : JSON.stringify(mvdata),
+    //         //dataType: "json",
+    //         //contentType: "application/json",
+    //         data : JSON.stringify(
+    //           {
+    //             "id" : mvdata.title,
+    //             "type" : "Movie",
+    //             "title": {
+    //               "value" : mvdata.title,
+    //               "type" : "String",
+    //             },
+    //             "cinema": {
+    //               "value" : "Odeon",
+    //               "type" : "String",
+    //             },
+    //             "category": {
+    //               "value" : mvdata.category,
+    //               "type" : "String",
+    //             },
+    //             "start_date": {
+    //               "value" : mvdata.start_date,
+    //               "type" : "Date",
+    //             },
+    //             "end_date": {
+    //               "value" : mvdata.end_date,
+    //               "type" : "Date",
+    //             }
+    //           }
+    //         ),
     //         success: function(data) {
-    //           // loadCard();
-    //           var info = data[0];
-    //           var sdate = new Date(info.start_date['$date']).toUTCString();
-    //           var edate = new Date(info.end_date['$date']).toUTCString();
-    //           // console.log(new Date(info.start_date['$date']).toUTCString());
-    //           console.log(info);
-    //           setTimeout(function (){
-    //             $("#title").text(info.title);
-    //             $("#category").text(info.category);
-    //             $("#sdate").text(sdate);
-    //             $("#edate").text(edate);
-    //             $("button").text("Submit");
-    //           },500)
-
+    //           console.log("Done")
     //         }
     //       })
     //     }
     //     else{
-    //       return false;
+    //       console.log("Error: Fields missing!");
     //     }
     // })
 

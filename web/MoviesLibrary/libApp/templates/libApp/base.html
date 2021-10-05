@@ -44,13 +44,16 @@
                 <li class="nav-item active" style="border-right: 1px solid; margin-right: 10px;">
                     <a class="nav-link" href="{% url 'favorites' %}"><b>Favorites</b> </a>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item active" style="border-right: 1px solid; margin-right: 10px;">
                   <a class="nav-link" href="{% url 'favorites' %}"><b>Search</b> </a>
-              </li>
+                </li>
+                <li class="nav-item active">
+                  <a class="nav-link" href="{% url 'favorites' %}"><b>Subscriptions</b> </a>
+                </li>
               {% elif role == 'cinemaowner' %}
                 <li class="nav-item active" >
                     <a class="nav-link" href="{% url 'add-movies' %}"><b>Register a new movie</b> </a>
-                </li>
+              </li>
               {% else %}
                 <li class="nav-item active">
                   <a class="nav-link" href="#">Manage users</a>

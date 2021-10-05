@@ -1,6 +1,7 @@
 import base64
 import requests.auth
 import requests
+import sys
 
 try:
     from urllib import urlencode
@@ -15,6 +16,7 @@ except ImportError:
 
 class OAuth2(object):
     def __init__(self):
+        # Should make these secrets env variables
         self.client_id = '47d89a60-79f3-423a-8898-1bfe823c3769'  # IDM APP CLIENT ID
         self.client_secret = '2bbd6ede-b454-4e64-8009-377a7a4c29df'  # IDM APP CLIENT SECRET
 
@@ -29,6 +31,8 @@ class OAuth2(object):
         self.signout_url = self.idm_address + 'auth/external_logout?_method=DELETE' 
 
         self.wilma_url = 'http://10.10.1.3:1027/'
+        self.orion_wilma_url = 'http://10.10.1.10:1027/'
+        self.orion_notf_api = 'http://10.10.1.2:5000/'
 
     def authorize_url(self, **kwargs):
         oauth_params = {'response_type': 'code','scope': 'token,permanent','state':'xyz', 'redirect_uri': self.redirect_uri, 'client_id': self.client_id}
@@ -50,7 +54,6 @@ class OAuth2(object):
         token_dict = json.loads(str_response_content)
         return token_dict
 
-	
 
     def get_user_info(self, token):
         response = requests.get(self.idm_address + 'user?access_token=' + token)
@@ -104,3 +107,77 @@ class OAuth2(object):
         uri = self.wilma_url + 'api/movie-owner/1' #passing 1 randomly cause api just because waits for something there
         response = requests.post(uri,headers=headers,data=json.dumps(data))
         return response
+
+    def movie_subscribe(self,token,mvid):
+        headers = {
+            'X-Auth-Token' : token,
+            'Content-Type' : 'application/json'
+        }
+        body = {
+          "description": "A subscription to a movie",
+          "subject": {
+            "entities": [
+              {
+                "id": mvid,
+                "type": "Movie"
+              }
+            ],
+            "condition": {
+              "attrs": [ #these are the triggers for notification
+                "title",
+                "cinema",
+                "category",
+                "start_date",
+                "end_date"
+              ]
+            }
+          },
+          "notification": {
+            "http": {
+              "url": self.orion_notf_api + "api/orion"
+            },
+            "attrs": [
+                "title",
+                "cinema",
+                "category",
+                "start_date",
+                "end_date"
+            ]
+          },
+          "expires": "2040-01-01T14:00:00.00Z",
+          "throttling": 5
+        }
+        uri = self.orion_wilma_url + '/v2/subscriptions'
+        # response = request.post(uri,headers=headers,body=body)
+        # return response.json
+        pass
+
+    def create_entity_orion(self,token,data):
+        headers = {
+            'X-Auth-Token' : token,
+            'Content-Type' : 'application/json'
+        }
+        body = {
+            # Orion doesnt accept spaces in id's, so replaced it with dash
+            "id" : data['movie-title'].replace(' ','-'),
+            "type" : "movie",
+            "category" : {
+                "value": data['category'],
+                "type": "String"
+            },
+            "cinema" : {
+                "value" : data['cinema_name'],
+                "type" : "String"
+            },
+            "start_date" : {
+                "value" : data['sdate'],
+                "type"  : "Date"
+            },
+            "end_date" : {     
+                "value" : data['edate'],
+                "type"  : "Date"
+            }        
+        }
+        uri = self.orion_wilma_url + 'v2/entities'
+        res = requests.post(uri,headers=headers, data=json.dumps(body)) 
+        return res

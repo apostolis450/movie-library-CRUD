@@ -11,6 +11,8 @@ urlpatterns = [
     path('ajax/favorites', views.ajax_favorites, name='ajax_favorites'),
     path('ajax/manage-movie/<str:id>', views.ajax_manage_movie, name='ajax-manage-movie'),
     path('ajax/owner-movies/<str:uid>',views.ajax_owner_movies,name='ajax-owner-movies'),
-    
-    path('signout', views.logout, name='signout')
+    path('ajax/create-entity',views.ajax_create_entity,name='ajax-create-entity'),
+
+    path('signout', views.logout, name='signout'),
+
 ]

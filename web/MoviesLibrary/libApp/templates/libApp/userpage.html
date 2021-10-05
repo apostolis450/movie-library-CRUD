@@ -6,52 +6,113 @@
   <div class="row">
 
     {% for mv in movies %}
-      <div class="col-3 col-md-4" id="movie-card">
-        <div class="card" >
-          <img class="card-img-top" src="{% static 'images/placeholder.jpg' %}" alt="Card image cap">
-          <div class="card-body">
-            <h5 class="card-title bg-light" style="text-align: center;font-size:35px;border-radius: 20px;">{{ mv.title }}</h5>
-            <p class="card-text"><strong>Cinema:</strong> {{ mv.cinema }}</p>
-            <p class="card-text"><strong>Category:</strong> {{ mv.category }}</p>
-            <p class="card-text"><small class="text-muted">Starts at: <b>{{ mv.start_date }}</b></small></p>
-            <p class="card-text"><small class="text-muted">Ends at: <b>{{ mv.end_date }}</b></small></p>
+    <div class="col-3 col-md-4" id="movie-card">
+      <div class="card">
+        <img class="card-img-top" src="{% static 'images/placeholder.jpg' %}" alt="Card image cap">
+        <div class="card-body">
+          <h5 class="card-title bg-light" style="text-align: center;font-size:35px;border-radius: 20px;">{{ mv.title }}
+          </h5>
+          <p class="card-text"><strong>Cinema:</strong> {{ mv.cinema }}</p>
+          <p class="card-text"><strong>Category:</strong> {{ mv.category }}</p>
+          <p class="card-text"><small class="text-muted">Starts at: <b>{{ mv.start_date }}</b></small></p>
+          <p class="card-text"><small class="text-muted">Ends at: <b>{{ mv.end_date }}</b></small></p>
 
-            <!-- <button id="fav-btn"><i class="fas fa-heart"></i> Add to favorites</button> -->
-            <input class="btn btn-outline-primary" data-movieid = "{{mv.id}}" type="button" id="like-mv-{{mv.num}}" name="like" onclick="ajax($(this));" value="Add to favorites"/>
-          </div>
+          <!-- <button id="fav-btn"><i class="fas fa-heart"></i> Add to favorites</button> -->
+          <input class="btn btn-outline-primary" data-movieid="{{mv.id}}" type="button" id="like-mv-{{mv.num}}"
+            name="like" onclick="like($(this));" value="Add to favorites" />
+          <input class="btn btn-outline-primary" data-movieid="{{mv.title}}" type="button" id="sub-mv-{{mv.num}}"
+            name="sub" onclick="sub($(this));" value="Subscribe" />
         </div>
       </div>
+    </div>
     {% empty %}
-      <p>No movies...</p>
+    <p>No movies...</p>
     {% endfor %}
-      
+
   </div>
 </div>
 <script type="text/javascript">
-function ajax($this) {
-      var tk = "{{token}}";
-      var mvid = $this.data('movieid');
-      var uid = "{{logged_in}}";
-        $.ajax({
-                   type: "POST",
-                   url: "http://10.10.1.3:1027/api/favorites",
-                   dataType: "json",
-                   headers: {
-                     "X-Auth-Token" : tk,
-                   },
-                   data: {
-                     id : mvid, 
-                     uid : uid
-                    },
-                  
-                   success: function(response) {
-                      console.log(el)    
-                      alert(response.message);      
-                    },
-                    error: function(rs, e) {
-                           alert(rs.responseText);
-                    }
-              }); 
-        }
+  function like($this) {
+    var tk = "{{token}}";
+    var mvid = $this.data('movieid');
+    var uid = "{{logged_in}}";
+    $.ajax({
+      type: "POST",
+      url: "http://10.10.1.3:1027/api/favorites",
+      dataType: "json",
+      headers: {
+        "X-Auth-Token": tk,
+      },
+      data: {
+        id: mvid,
+        uid: uid
+      },
 
-  </script>
+      success: function (response) {
+        console.log(el)
+        alert(response.message);
+      },
+      error: function (rs, e) {
+        alert(rs.responseText);
+      }
+    });
+  }
+
+  function sub($this) {
+    var tk = "{{token}}";
+    var mvid = $this.data('movieid');
+    var uid = "{{logged_in}}";
+    $.ajax({
+      type: "POST",
+      url: "http://localhost:1028/v2/subscriptions",
+      // dataType: "json",
+      headers: {
+        "X-Auth-Token": tk,
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({
+        "description": "Subscription_to_movie_".concat(mvid),
+        "subject": {
+          "entities": [
+            {
+              "id": "".concat(mvid),
+              "type": "Movie"
+            }
+          ],
+          "condition": {
+            "attrs": [
+              "title",
+              "category",
+              "cinema",
+              "start_date",
+              "end_date"
+            ]
+          }
+        },
+        "notification": {
+          "http": {
+            "url": "{{orion_notf}}".concat("/api/orion")
+          },
+          "attrs": [
+            "title",
+            "category",
+            "cinema",
+            "start_date",
+            "end_date"
+          ]
+        },
+        "expires": "2040-01-01T14:00:00.00Z",
+        "throttling": 5
+      }),
+      success: function (response) {
+        // console.log("-------------------")
+        console.log(response.message);
+      },
+      error: function (rs, e) {
+        console.log(rs.responseText);
+      }
+    });
+  }
+
+
+</script>

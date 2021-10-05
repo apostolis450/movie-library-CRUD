@@ -96,7 +96,7 @@ def edit_movie(mvid):
 		return make_response(movie_obj.to_json(), 201)
 	elif request.method == 'POST':
 		content=json.loads(request.data.decode('UTF-8'))
-		# Sample of incoming data format ->
+		# incoming data format ->
 		# {"movie-title": "asdasdasd", "category": "Action", "sdate": "2021-09-10", "edate": "2021-09-29"}
 		title = content['movie-title']
 		category = content['category']
@@ -111,7 +111,6 @@ def edit_movie(mvid):
 		movie_obj = Movies.objects(pk = mvid).first()
 		movie_obj.delete()
 		return make_response("deleted!", 204)
-
 
 #get all movies / Post new movie
 @app.route('/api/movies', methods=['GET', 'POST'])
@@ -190,6 +189,18 @@ def db_init():
 	
 	return make_response("ok",201)
 
+@app.route('/api/orion',methods=['POST'])
+def orion():
+	print(request.json)
+	return make_response('ok',204)
+
+# @app.route('/test',methods=['POST'])
+# def test():
+	# print(type(request.data))
+	# if request.method == 'POST':
+		# print('------------------------------------------')
+		# print(json.loads(request.data.decode('UTF-8')))
+	# return make_response('ok',204)
 
 if __name__=='__main__':
 	app.run(debug=True, host="0.0.0.0") #debug=True so server autoreloads on every change!
