@@ -189,12 +189,14 @@ def db_init():
 	
 	return make_response("ok",201)
 
-@app.route('/api/orion',methods=['POST'])
-def orion():
-	print(request.json)
+# Endpoint for orion notifications
+@app.route('/api/orion/uid',methods=['POST'])
+def orion(uid):
+	print("--------------------------")
+	print(uid)
 	return make_response('ok',204)
 
-# @app.route('/test',methods=['POST'])
+# @app.route('/test',methods=['POST']) #just a test endpoint for the api
 # def test():
 	# print(type(request.data))
 	# if request.method == 'POST':

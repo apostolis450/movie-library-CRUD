@@ -79,7 +79,7 @@ services:
         networks:
             default:
                 ipv4_address: 10.10.1.7
-    # 10.10.1.2 api for using main db
+    # 10.10.1.2 api for accessing main db
     data_storage:
         build: 
             context : ./data_storage_service

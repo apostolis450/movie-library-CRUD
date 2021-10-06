@@ -76,7 +76,7 @@ def favorites(request):
             # context['movies'] = res
             # print(res)
         else:
-            return render(request,'libApp/404.html',context={})
+            return render(request,'libApp/403.html',context={})
         # else:
             # pass #Here I could redirect to a page saying 'unknown role!' or not authorized to access this page
     
@@ -108,17 +108,19 @@ def add_movie(request):
                 content.pop('csrfmiddlewaretoken',None)
                 content['uid'] = logged_in
                 # Pass data to auth file, then send the request to db API from there
-                # res = auth_app.register_movie_owner(request.session.get('token', None),content)
+                res = auth_app.register_movie_owner(request.session.get('token', None),content)
                 # -------------------to take info about the cinema owner
+                # sleep(0.1)
                 res_cin = auth_app.get_movies_owner(request.session.get('token', None),logged_in)
                 content['cinema_name'] = res_cin[0]['cinema']
-                # -------------------create entity at orion's DB
+                # -------------------create entity at orion's DB (TODO: add title as attribute-ommited it)
+                # sleep(0.1)
                 orion_res = auth_app.create_entity_orion(request.session.get('token', None),content)
                 messages.success(request, 'Successfully added!')
                 return HttpResponseRedirect("/app/add-movies")
             return render(request, 'libApp/add_movie.html',context)
         else:
-            return render(request,'libApp/404.html')
+            return render(request,'libApp/403.html')
 
 def manage_movie(request,id):
     logged_in = request.session.get('uid',False)
@@ -141,6 +143,8 @@ def manage_movie(request,id):
     else:
         if role == 'cinemaowner':
             return render(request, 'libApp/edit_movie.html',context)
+        else:
+            return render(request,'libApp/403.html')
 
 def ajax_create_entity(request):
     if request.is_ajax():

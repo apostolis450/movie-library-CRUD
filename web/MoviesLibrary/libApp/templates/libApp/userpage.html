@@ -60,7 +60,7 @@
 
   function sub($this) {
     var tk = "{{token}}";
-    var mvid = $this.data('movieid');
+    var mv_title = $this.data('movieid').split(" ").join("-");
     var uid = "{{logged_in}}";
     $.ajax({
       type: "POST",
@@ -71,19 +71,17 @@
         "Content-Type": "application/json",
       },
       data: JSON.stringify({
-        "description": "Subscription_to_movie_".concat(mvid),
+        "description": "Subscription_to_movie_".concat(mv_title),
         "subject": {
           "entities": [
             {
-              "id": "".concat(mvid),
-              "type": "Movie"
+              "id": mv_title,
+              "type": "movie"
             }
           ],
           "condition": {
             "attrs": [
-              "title",
               "category",
-              "cinema",
               "start_date",
               "end_date"
             ]
@@ -91,10 +89,9 @@
         },
         "notification": {
           "http": {
-            "url": "{{orion_notf}}".concat("/api/orion")
+            "url": "{{orion_notf}}".concat("api/orion/").concat("{{logged_in}}")
           },
           "attrs": [
-            "title",
             "category",
             "cinema",
             "start_date",
@@ -105,11 +102,12 @@
         "throttling": 5
       }),
       success: function (response) {
-        // console.log("-------------------")
-        console.log(response.message);
+        console.log("success");
+        // console.log(response.message);
       },
       error: function (rs, e) {
-        console.log(rs.responseText);
+        console.log("fail");
+        // console.log(rs.responseText);
       }
     });
   }
