@@ -31,7 +31,9 @@
 
   </div>
 </div>
+
 <script type="text/javascript">
+
   function like($this) {
     var tk = "{{token}}";
     var mvid = $this.data('movieid');
@@ -58,59 +60,88 @@
     });
   }
 
+  // Firstly checks if user is already subscribed, cause orion doesn't
   function sub($this) {
     var tk = "{{token}}";
     var mv_title = $this.data('movieid').split(" ").join("-");
     var uid = "{{logged_in}}";
-    $.ajax({
-      type: "POST",
-      url: "http://localhost:1028/v2/subscriptions",
-      // dataType: "json",
-      headers: {
-        "X-Auth-Token": tk,
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify({
-        "description": "Subscription_to_movie_".concat(mv_title),
-        "subject": {
-          "entities": [
-            {
-              "id": mv_title,
-              "type": "movie"
+    sub_api(mv_title).done(function () {
+      $.ajax({
+        type: "POST",
+        url: "http://localhost:1028/v2/subscriptions",
+        // dataType: "json",
+        headers: {
+          "X-Auth-Token": tk,
+          "Content-Type": "application/json",
+        },
+        data: JSON.stringify({
+          "description": "Subscription_to_movie_".concat(mv_title),
+          "subject": {
+            "entities": [
+              {
+                "id": mv_title,
+                "type": "movie"
+              }
+            ],
+            "condition": {
+              "attrs": [
+                "category",
+                "start_date",
+                "end_date"
+              ]
             }
-          ],
-          "condition": {
+          },
+          "notification": {
+            "http": {
+              "url": "{{orion_notf}}".concat("api/orion/").concat("{{logged_in}}")
+            },
             "attrs": [
               "category",
+              "cinema",
               "start_date",
               "end_date"
             ]
-          }
-        },
-        "notification": {
-          "http": {
-            "url": "{{orion_notf}}".concat("api/orion/").concat("{{logged_in}}")
           },
-          "attrs": [
-            "category",
-            "cinema",
-            "start_date",
-            "end_date"
-          ]
+          "expires": "2040-01-01T14:00:00.00Z",
+          "throttling": 5
+        }),
+        success: function (response) {
+          console.log("orion-success");
+          // console.log(response.message);
+          // sub_api(mv_title);
         },
-        "expires": "2040-01-01T14:00:00.00Z",
-        "throttling": 5
+        error: function (rs, e) {
+          console.log("orion-fail");
+          // console.log(rs.responseText);
+        }
+      });
+    })
+
+  }
+
+  function sub_api(mvid) {
+    var tk = "{{token}}";
+    return $.ajax({
+      type: "POST",
+      async: false,
+      // sends the movie title as ID
+      url: "http://10.10.1.3:1027/api/sub/".concat(mvid),
+      headers: {
+        "X-Auth-Token": tk,
+        "Content-type": "application/json"
+      },
+      data: JSON.stringify({
+        "uid": "{{logged_in}}"
       }),
       success: function (response) {
-        console.log("success");
-        // console.log(response.message);
+        // console.log("Egine")
+        alert("Done");
       },
-      error: function (rs, e) {
-        console.log("fail");
-        // console.log(rs.responseText);
+      error: function (response) {
+        // console.log("Prob")
+        alert("Already subscribed!");
       }
     });
   }
-
 
 </script>

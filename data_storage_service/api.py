@@ -58,6 +58,16 @@ class Favorites(db.Document):
 			"user_id"  : self.user_id
 		}
 
+class Subscriptions(db.Document):
+	movie_id = db.ReferenceField(Movies, required=True, reverse_delete_rule=CASCADE)
+	user_id = db.StringField() 
+
+	def to_json(self):
+		return {
+			"_id" : str(self.pk),
+			"movie_id" : str(self.movie_id.pk),
+			"user_id"  : self.user_id
+		}
 # ----------------------------------------------------------------
 
 # ---------------------- API ENDPOINTS ---------------------------
@@ -190,19 +200,36 @@ def db_init():
 	return make_response("ok",201)
 
 # Endpoint for orion notifications
-@app.route('/api/orion/uid',methods=['POST'])
+@app.route('/api/orion/<uid>',methods=['POST'])
 def orion(uid):
 	print("--------------------------")
 	print(uid)
 	return make_response('ok',204)
 
-# @app.route('/test',methods=['POST']) #just a test endpoint for the api
-# def test():
-	# print(type(request.data))
-	# if request.method == 'POST':
-		# print('------------------------------------------')
-		# print(json.loads(request.data.decode('UTF-8')))
-	# return make_response('ok',204)
+# Endpoint for saving user's subscription
+@app.route('/api/sub/<id>',methods=['GET', 'POST'])
+def subs(id):
+	if request.method == 'GET':
+		# Here id is user's id
+		subs = []
+		movies = []
+		for sb in Subscriptions.objects:
+			subs.append(sb.to_json())
+		for i in range(len(subs)):
+			mv = Movies.objects(pk = subs[i]['movie_id']).first()
+			movies.append(mv.to_json())
+		return make_response(jsonify(movies), 200)
+	elif request.method == 'POST':
+		# ----------- here id is movie title->find movie id from mongo
+		uid = request.json['uid'] 
+		# ----------- replace -> has different format for orion
+		mv = Movies.objects(title = id.replace('-',' ')).first() 
+		sb = Subscriptions.objects(movie_id = mv,user_id = uid).first()
+		if sb is not None:
+			return make_response("Already Subscribed!", 405)
+		else:	
+			Subscriptions(movie_id = mv,user_id = uid).save()
+			return make_response("Added to favorites!", 201)
 
 if __name__=='__main__':
 	app.run(debug=True, host="0.0.0.0") #debug=True so server autoreloads on every change!
