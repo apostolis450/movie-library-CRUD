@@ -61,12 +61,14 @@ class Favorites(db.Document):
 class Subscriptions(db.Document):
 	movie_id = db.ReferenceField(Movies, required=True, reverse_delete_rule=CASCADE)
 	user_id = db.StringField() 
+	updated = db.BooleanField(default=False)
 
 	def to_json(self):
 		return {
 			"_id" : str(self.pk),
 			"movie_id" : str(self.movie_id.pk),
-			"user_id"  : self.user_id
+			"user_id"  : self.user_id,
+			"updated"  : self.updated
 		}
 # ----------------------------------------------------------------
 
@@ -199,11 +201,21 @@ def db_init():
 	
 	return make_response("ok",201)
 
-# Endpoint for orion notifications
-@app.route('/api/orion/<uid>',methods=['POST'])
-def orion(uid):
-	print("--------------------------")
-	print(uid)
+# Endpoint for orion's notifications
+@app.route('/api/orion/<id>',methods=['POST'])
+def orion(id):
+	# here id is movie title from orion
+	content = json.dumps(request.json['data'])
+	mv_title = json.loads(content)[0]['id'] #type: list | extract only id
+	mv = Movies.objects(title = mv_title).first()
+	sb = Subscriptions.objects(movie_id=mv.pk)
+	if sb is not None:
+		for sub in sb:
+			sub.update(updated = True)
+	"""
+	Orion sends json with new data | Find movie obj by title |
+	find object in subs with uid | Set to this sub update=True
+	"""
 	return make_response('ok',204)
 
 # Endpoint for saving user's subscription
@@ -213,11 +225,16 @@ def subs(id):
 		# Here id is user's id
 		subs = []
 		movies = []
-		for sb in Subscriptions.objects:
+		updated = {}
+		for sb in Subscriptions.objects(user_id = id):
 			subs.append(sb.to_json())
+			if(sb.updated):
+				updated[str(sb.movie_id)] = "Updated!"
+				sb.update(updated = False)
 		for i in range(len(subs)):
 			mv = Movies.objects(pk = subs[i]['movie_id']).first()
 			movies.append(mv.to_json())
+		movies.append(updated)
 		return make_response(jsonify(movies), 200)
 	elif request.method == 'POST':
 		# ----------- here id is movie title->find movie id from mongo
