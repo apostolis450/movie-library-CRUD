@@ -1,0 +1,132 @@
+{% extends 'libApp/base.html' %}
+{% load static %}
+{% block content %}
+<div class="bg-secondary w-75" style="margin: 0 auto;margin-bottom: 20px;border-radius: 20px;">
+    <p class="text-center text-white h2">Subscriptions:</p>
+</div>
+<div class="container">
+    <div class="row">
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        doPoll();
+    });
+
+    function doPoll() {
+        init();
+        setTimeout(doPoll, 5000);
+
+    };
+
+    function init() {
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:1027/".concat("api/sub/{{logged_in}}"),
+            dataType: "json",
+            data: {},
+            headers: {
+                "X-Auth-Token": "{{token}}",
+            },
+            success: function (data) {
+                $("div.row").empty();
+                var row = $('div.row');
+                if (data.length == 0) {
+                    row.append('<p class="text-center h2">You have no subscriptions..</p>')
+                }
+                $.each(data, function (i, mv) {
+                    var html = `<div class="col-3 col-md-4" id="movie-card">\n\t<div class="card ` + mv.id + `">
+                  \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
+                  \n<div class="card-body">
+                  \n\t<h5 id=`+ mv.id + ` class="card-title bg-light" style="text-align: center;font-size:35px">` + mv.title + `</h5>
+                  \n<p class="card-text"><strong>Cinema:</strong>`+ mv.cinema + `</p>
+                  \n<p class="card-text"><strong>Category:</strong>`+ mv.category + `</p>
+                  \n<p class="card-text"><small class="text-muted">Starts at: <b>`+ mv.start_date + `</b></small></p>
+                  \n<p class="card-text"><small class="text-muted">Ends at: <b>`+ mv.end_date + `</b></small></p>
+                  \n<input class="btn btn-danger" data-movieid = `+ mv.id + ` type="button" id="delete" name="like" onclick="ajax($(this));" value="Unsubscribe"/>
+                  \n</div>\n</div>\n</div>
+                  `
+                    row.append(html)
+                })
+
+
+            },
+            error: function (response, e) {
+                console.log(e)
+            }
+        });
+    }
+
+    // DELETE subscription
+    function ajax($this) {
+        var tk = "{{token}}";
+        var mvid = $this.data('movieid');
+        var uid = "{{logged_in}}";
+        $.ajax({
+            type: "DELETE",
+            url: "http://localhost:1027/".concat("api/sub/{{logged_in}}"),
+            dataType: "json",
+            headers: {
+                "X-Auth-Token": tk,
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify({
+                "mvid": mvid,
+            }),
+            success: function (response) {
+                var title = document.getElementById(''.concat(mvid));
+                delSub(title.textContent.split(' ').join('-'))
+                $("div.card").remove(".".concat(mvid));
+                $("div.row").empty();
+                setTimeout(function () {// wait for 0.01 secs(2)
+                    init(); // then "reload" the page.(3)
+                }, 10);
+            },
+            error: function (rs, e) {
+                // console.log(".".concat(mvid))
+                console.log(rs.responseText);
+            }
+        });
+    }
+
+    function delSub(id) {
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:1028//v2/subscriptions",//.concat(id),
+            headers: {
+                "X-Auth-Token": "{{token}}",
+            },
+            success: function (data) {
+                console.log(data)
+                $.each(data, function (i, d) {
+                    if (d.subject.entities[0].id == id) {
+                        del(d.id);
+                    }
+                })
+            },
+            error: function (rs, e) {
+                console.log(rs.responseText);
+            }
+        });
+    }
+
+    function del(id) {
+        $.ajax({
+            type: "DELETE",
+            url: "http://localhost:1028//v2/subscriptions/".concat(id),
+            headers: {
+                "X-Auth-Token": "{{token}}",
+            },
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (rs, e) {
+                console.log(rs.responseText);
+            }
+        });
+    }
+
+</script>
+{% endblock %}

@@ -2,11 +2,11 @@
 {% load static %}
 {% block content %}
 <div class="bg-secondary w-75" style="margin: 0 auto;margin-bottom: 20px;border-radius: 20px;">
-    <p class="text-center text-white h3">My favorite movies</p>
+  <p class="text-center text-white h3">My favorite movies</p>
 </div>
 <div class="container">
-    <div class="row">
-      <!-- {% for mv in movies %}
+  <div class="row">
+    <!-- {% for mv in movies %}
         <div class="col-3 col-md-4" id="movie-card">
           <div class="card {{mv.id}}">
             <img class="card-img-top" src="{% static 'images/placeholder.jpg' %}" alt="Card image cap">
@@ -23,107 +23,112 @@
       {% empty %}
         <p>No movies...</p>
       {% endfor %} -->
-        
-    </div>
-  </div>
 
-  <script type="text/javascript">
-    
-    $(document).ready(function(){
-      // console.log('this is run on page load');
-      // myFunction();
-      $.ajax({
-        type: "GET",
-        url: "/ajax/favorites",
-        dataType: "json",
-        data: {movies:'movies'},
-        success: function(data){
-          var row = $('div.row');
-          if(JSON.parse(data).length == 0){
-             row.append('<p class="text-center h2">You have no favorite movies..</p>')
-          }
-          $.each(JSON.parse(data), function(i,mv){
-            // console.log(mv)
-            var html = `<div class="col-3 col-md-4" id="movie-card">\n\t<div class="card `+mv.id+`">
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  $(document).ready(function () {
+    // console.log('this is run on page load');
+    // myFunction();
+    $.ajax({
+      type: "GET",
+      url: "/ajax/favorites",
+      dataType: "json",
+      data: { movies: 'movies' },
+      success: function (data) {
+        console.log(data)
+        var row = $('div.row');
+        if (JSON.parse(data).length == 0) {
+          row.append('<p class="text-center h2">You have no favorite movies..</p>')
+        }
+        $.each(JSON.parse(data), function (i, mv) {
+          // console.log(mv)
+          var html = `<div class="col-3 col-md-4" id="movie-card">\n\t<div class="card ` + mv.id + `">
               \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
               \n<div class="card-body">
-              \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+mv.title+`</h5>
-              \n<p class="card-text"><strong>Cinema:</strong>`+mv.cinema+`</p>
-              \n<p class="card-text"><strong>Category:</strong>`+mv.category+`</p>
-              \n<p class="card-text"><small class="text-muted">Starts at: <b>`+mv.start_date+`+</b></small></p>
-              \n<p class="card-text"><small class="text-muted">Ends at: <b>`+mv.end_date+`</b></small></p>
-              \n<input class="btn btn-danger" data-movieid = `+ mv.id +` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
+              \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+ mv.title + `</h5>
+              \n<p class="card-text"><strong>Cinema:</strong>`+ mv.cinema + `</p>
+              \n<p class="card-text"><strong>Category:</strong>`+ mv.category + `</p>
+              \n<p class="card-text"><small class="text-muted">Starts at: <b>`+ mv.start_date + `+</b></small></p>
+              \n<p class="card-text"><small class="text-muted">Ends at: <b>`+ mv.end_date + `</b></small></p>
+              \n<input class="btn btn-danger" data-movieid = `+ mv.id + ` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
               \n</div>\n</div>\n</div>
               `
-              row.append(html)
-          })
-         },
-        error: function(response,e){
-          console.log(e)
-         }
-       });
-    });
-    
-    function ajax($this) {
-        var tk = "{{token}}";
-        var mvid = $this.data('movieid');
-        var uid = "{{logged_in}}";
-            $.ajax({
-                    type: "DELETE",
-                    url: "http://10.10.1.3:1027/api/favorites",
-                    dataType: "json",
-                    headers: {
-                      "X-Auth-Token" : tk,
-                    },
-                    data: {
-                      id : mvid, 
-                      uid : uid
-                     },
-                    success: function(response) {
-                        $("div.card").remove(".".concat(mvid));
-                        $("div.row").empty();
-                        setTimeout(function(){// wait for 5 secs(2)
-                          reload(); // then reload the page.(3)
-                        }, 200);
-                    },
-                    error: function(rs, e) {
-                        // console.log(".".concat(mvid))
-                        alert(rs.responseText);
-                    }
-                  }); 
+          row.append(html)
+        })
+      },
+      error: function (response, e) {
+        console.log(e)
       }
+    });
+  });
 
-    function reload(){
-      $.ajax({
-         type: "GET",
-         url: "/ajax/favorites",
-         dataType: "json",
-         data: {movies:'movies'},
-         success: function(data){
-           if(data == ''){
-             console.log('emptyyyyyyyyyyyyyyyyyy')
-           }
-           var row = $('div.row');
-           $.each(JSON.parse(data), function(i,mv){
-             // console.log(mv)
-             var html = `<div class="col-3 col-md-4" id="movie-card">\n\t<div class="card `+mv.id+`">
+  
+  function ajax($this) {
+    var tk = "{{token}}";
+    var mvid = $this.data('movieid');
+    var uid = "{{logged_in}}";
+    $.ajax({
+      type: "DELETE",
+      url: "http://10.10.1.3:1027/api/favorites",
+      dataType: "json",
+      headers: {
+        "X-Auth-Token": tk,
+      },
+      data: {
+        id: mvid,
+        uid: uid
+      },
+      success: function (response) {
+        $("div.card").remove(".".concat(mvid));
+        $("div.row").empty();
+        setTimeout(function () {// wait for 5 secs(2)
+          reload(); // then reload the page.(3)
+        }, 200);
+      },
+      error: function (rs, e) {
+        // console.log(".".concat(mvid))
+        alert(rs.responseText);
+      }
+    });
+  }
+
+  function reload() {
+    $.ajax({
+      type: "GET",
+      url: "/ajax/favorites",
+      dataType: "json",
+      data: { movies: 'movies' },
+      success: function (data) {
+        if (data == '') {
+          console.log('empty response')
+        }
+        var row = $('div.row');
+        if (JSON.parse(data).length == 0) {
+          row.append('<p class="text-center h2">You have no favorite movies..</p>')
+        }
+        $.each(JSON.parse(data), function (i, mv) {
+          // console.log(mv)
+          var html = `<div class="col-3 col-md-4" id="movie-card">\n\t<div class="card ` + mv.id + `">
                \n\t<img class="card-img-top" src="{% static "images/placeholder.jpg" %}" alt="Card image cap">
                \n<div class="card-body">
-               \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+mv.title+`</h5>
-               \n<p class="card-text"><strong>Cinema:</strong>`+mv.cinema+`</p>
-               \n<p class="card-text"><strong>Category:</strong>`+mv.category+`</p>
-               \n<p class="card-text"><small class="text-muted">Starts at: <b>`+mv.start_date+`+</b></small></p>
-               \n<p class="card-text"><small class="text-muted">Ends at: <b>`+mv.end_date+`</b></small></p>
-               \n<input class="btn btn-danger" data-movieid = `+mv.id+` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
+               \n\t<h5 class="card-title bg-light" style="text-align: center;font-size:35px">`+ mv.title + `</h5>
+               \n<p class="card-text"><strong>Cinema:</strong>`+ mv.cinema + `</p>
+               \n<p class="card-text"><strong>Category:</strong>`+ mv.category + `</p>
+               \n<p class="card-text"><small class="text-muted">Starts at: <b>`+ mv.start_date + `+</b></small></p>
+               \n<p class="card-text"><small class="text-muted">Ends at: <b>`+ mv.end_date + `</b></small></p>
+               \n<input class="btn btn-danger" data-movieid = `+ mv.id + ` type="button" id="delete" name="like" onclick="ajax($(this));" value="Delete from favorites"/>
                \n</div>\n</div>\n</div>
                `
-               row.append(html)
-           })
-          },
-         error: function(response,e){
-           console.log(e)
-          }
-      });
-    }
-      </script>
+          row.append(html)
+        })
+      },
+      error: function (response, e) {
+        console.log(e)
+      }
+    });
+  }
+</script>
 {% endblock %}

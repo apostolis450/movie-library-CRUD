@@ -72,14 +72,32 @@ def favorites(request):
     else:
         if role == 'user':
             return render(request, 'libApp/favorites.html', context)        
-            # res = auth_app.get_fav_movies_user(request.session.get('token', None))
-            # context['movies'] = res
-            # print(res)
         else:
             return render(request,'libApp/403.html',context={})
-        # else:
-            # pass #Here I could redirect to a page saying 'unknown role!' or not authorized to access this page
     
+def subscriptions(request):
+    logged_in = request.session.get('uid',False)
+    uname = request.session.get('uname',None)
+    role = request.session.get('role',None)
+    tk = request.session.get('token',None)
+    wilma_url = auth_app.wilma_url
+    context = {
+        'logged_in' : logged_in,
+        'auth_uri' : auth_uri,
+        'signout_uri' : signout_uri,
+        'uname' : uname,
+        'role' : role,
+        'token' : tk,
+        'wilma_url':wilma_url,
+    }
+    if not logged_in:
+        redirect('home')
+    else:
+        if role == 'user':
+            return render(request, 'libApp/subscriptions.html', context)        
+        else:
+            return render(request,'libApp/403.html',context={})
+
 #This functionality is done here, not with ajax call
 def add_movie(request):
     logged_in = request.session.get('uid',False)

@@ -166,7 +166,7 @@ def api_favorites():
 		else:	
 			Favorites(movie_id = mv,user_id = uid).save()
 			return make_response("Added to favorites!", 201)
-	else: #DELETE
+	elif request.method == 'DELETE':
 		content = request.form.to_dict() #decode ajax's data
 		movie_id = content["id"]
 		uid = content["uid"]
@@ -219,7 +219,7 @@ def orion(id):
 	return make_response('ok',204)
 
 # Endpoint for saving user's subscription
-@app.route('/api/sub/<id>',methods=['GET', 'POST'])
+@app.route('/api/sub/<id>',methods=['GET', 'POST', 'DELETE'])
 def subs(id):
 	if request.method == 'GET':
 		# Here id is user's id
@@ -234,7 +234,7 @@ def subs(id):
 		for i in range(len(subs)):
 			mv = Movies.objects(pk = subs[i]['movie_id']).first()
 			movies.append(mv.to_json())
-		movies.append(updated)
+		# movies.append(updated)
 		return make_response(jsonify(movies), 200)
 	elif request.method == 'POST':
 		# ----------- here id is movie title->find movie id from mongo
@@ -247,6 +247,13 @@ def subs(id):
 		else:	
 			Subscriptions(movie_id = mv,user_id = uid).save()
 			return make_response("Added to favorites!", 201)
+	elif request.method == 'DELETE':
+		# content = request.form.to_dict() #decode ajax's data
+		movie_id = request.json['mvid']
+		uid = id
+		sb = Subscriptions.objects(movie_id = movie_id,user_id = uid).first()
+		sb.delete()
+		return make_response("Successfuly deleted!", 204)
 
 if __name__=='__main__':
 	app.run(debug=True, host="0.0.0.0") #debug=True so server autoreloads on every change!

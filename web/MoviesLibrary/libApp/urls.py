@@ -5,6 +5,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('app', views.main, name='main'),
     path('app/favorites', views.favorites, name='favorites'),
+    path('app/subscriptions', views.subscriptions, name='subscriptions'),
     path('app/add-movies', views.add_movie, name='add-movies'),
     path('app/manage-movie/<str:id>', views.manage_movie, name='manage-movie'),
 
